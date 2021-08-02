@@ -24,10 +24,23 @@ app.use(express.static(__dirname + '/public'));
 let productos = [];
 let producto;
 let productosWs = [];
+let mensajes = [];
 
 io.on('connection', (socket) => {
 
-  io.sockets.emit('mensajes', productosWs);
+  socket.emit(`mensajes`, { mensajes: mensajes })
+
+  socket.on('nuevo-mensaje', (nuevoMensaje) => {    
+    let elNuevoMensaje = {
+      mensaje: nuevoMensaje.mensaje,
+      hora: nuevoMensaje.hora,
+      email: nuevoMensaje.email
+    }
+    mensajes.push(elNuevoMensaje)
+    io.sockets.emit('recibir nuevoMensaje', [elNuevoMensaje])
+  })
+
+  io.sockets.emit('productosWs', productosWs);
 
   socket.on('producto-nuevo', data => {
     productosWs.push(data);

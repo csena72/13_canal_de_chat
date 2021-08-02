@@ -6,16 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">    
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
         var socket = io();
-        socket.on('mensajes', data => {
+        socket.on('productosWs', data => {
             productosWs = JSON.stringify(data);            
         });
 
@@ -27,6 +26,51 @@
             }
             socket.emit('producto-nuevo', producto);
         }
+
+        var template = Handlebars.compile(`
+            {{# each mensajes }}
+                <div class="border rounded mb-3 p-2">       
+                    <p class="text-muted m-0">Email: <span class="font-weight-bold text-primary">{{ this.email }}</span></p>
+                    <p class="text-muted m-0">Enviado: <span style="color:brown;">{{this.hora}}</span></p>
+                    <p class="text-muted m-0">Mensaje: <span class="font-italic text-success">{{ this.mensaje }}</span></p>
+                </div>
+            {{else}}
+                <div class="border rounded mb-3 p-2">
+                    <p class="text-muted m-0">No hay mensajes.</p>
+                </div>
+            {{/each}}            
+        `)
+
+        function addAllMessages(data) {            
+            document.getElementById('mensajes').innerHTML = template({ mensajes: data.mensajes});
+        }
+
+        function addNewMessage(listaMensajes) {
+            document.getElementById("mensajes").insertAdjacentHTML('beforeend', template({ mensajes: listaMensajes }));
+        }
+
+        function enviarMensaje() {
+            let hora = moment().format('DD/MM/YYYY HH:mm:ss');
+            let mensaje = document.getElementById('mensaje').value;
+            let email = document.getElementById('email').value;
+            if (email.length > 1) {
+                socket.emit('nuevo-mensaje', {
+                    email: email,
+                    hora: hora,
+                    mensaje: mensaje
+                })
+            } else {
+                alert('Debe ingresar un email')
+            }
+        }
+
+        socket.on(`mensajes`, function(data) {                       
+            addAllMessages(data)
+        })
+
+        socket.on('recibir nuevoMensaje', function(listaMensajes) {                                 
+            addNewMessage(listaMensajes)
+        })
 
     </script>
 
