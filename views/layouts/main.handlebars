@@ -29,15 +29,11 @@
 
         var template = Handlebars.compile(`
             {{# each mensajes }}
-                <div class="border rounded mb-3 p-2">       
-                    <p class="text-muted m-0">Email: <span class="font-weight-bold text-primary">{{ this.email }}</span></p>
-                    <p class="text-muted m-0">Enviado: <span style="color:brown;">{{this.hora}}</span></p>
-                    <p class="text-muted m-0">Mensaje: <span class="font-italic text-success">{{ this.mensaje }}</span></p>
-                </div>
-            {{else}}
-                <div class="border rounded mb-3 p-2">
-                    <p class="text-muted m-0">No hay mensajes.</p>
-                </div>
+                <p class="text-muted m-0">
+                        <span class="font-weight-bold text-primary">{{ this.email }}</span>
+                        <span style="color:brown;">[{{this.hora}}]</span>
+                        <span class="font-italic text-success">{{ this.mensaje }}</span>
+                </p>            
             {{/each}}            
         `)
 
@@ -45,8 +41,8 @@
             document.getElementById('mensajes').innerHTML = template({ mensajes: data.mensajes});
         }
 
-        function addNewMessage(listaMensajes) {
-            document.getElementById("mensajes").insertAdjacentHTML('beforeend', template({ mensajes: listaMensajes }));
+        function addNewMessage(listaMensajes) {            
+            document.getElementById("mensajes").innerHTML +=  template({ mensajes: listaMensajes });
         }
 
         function enviarMensaje() {
