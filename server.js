@@ -28,7 +28,7 @@ let mensajes = [];
 
 io.on('connection', (socket) => {
 
-  socket.emit(`mensajes`, { mensajes: mensajes })
+  socket.emit('mensajes', { mensajes: mensajes })
 
   socket.on('nuevo-mensaje', (nuevoMensaje) => {    
     let elNuevoMensaje = {
