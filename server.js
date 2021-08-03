@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 var exphbs = require('express-handlebars');
 
 const app = express();
@@ -11,8 +10,8 @@ const server = http.createServer(app);
 const {Server} = require('socket.io');
 const io = new Server(server);
 
-app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
